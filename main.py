@@ -13,21 +13,17 @@ from telethon.tl.types import ReactionEmoji
 from telethon.errors import FloodWaitError, InviteHashInvalidError, UserAlreadyParticipantError, SessionPasswordNeededError, ChannelPrivateError
 
 # ================= MONKEY PATCH FOR BUTTON STYLE =================
-# Save original methods
 _original_inline = Button.inline
 _original_url = Button.url
 
-def patched_inline(text, data=None, url=None, **kwargs):
-    # Remove style parameter if present
+def patched_inline(text, data=None, **kwargs):
     kwargs.pop('style', None)
-    return _original_inline(text, data=data, url=url, **kwargs)
+    return _original_inline(text, data=data, **kwargs)
 
 def patched_url(text, url, **kwargs):
-    # Remove style parameter if present
     kwargs.pop('style', None)
     return _original_url(text, url, **kwargs)
 
-# Apply patches
 Button.inline = patched_inline
 Button.url = patched_url
 # ================================================================
@@ -265,16 +261,15 @@ async def start_command(event):
     
     if is_owner(user.id):
         buttons = [
-            [Button.inline("𝗔𝗗𝗠𝗜𝗡", data="admin_panel", style="primary"),
-             Button.inline("𝗢𝗪𝗡𝗘𝗥", data="owner_panel", style="danger")],
-            [Button.inline("𝗔𝗗𝗗 𝗜𝗗", data="add_session", style="success"),
-             Button.inline("𝗧𝗔𝗥𝗚𝗘𝗧", data="target_menu", style="primary")]
+            [Button.inline("𝗔𝗗𝗠𝗜𝗡", data="admin_panel"),
+             Button.inline("𝗢𝗪𝗡𝗘𝗥", data="owner_panel")],
+            [Button.inline("𝗔𝗗𝗗 𝗜𝗗", data="add_session"),
+             Button.inline("𝗧𝗔𝗥𝗚𝗘𝗧", data="target_menu")]
         ]
     elif is_admin(user.id):
         buttons = [
-            [Button.inline("𝗔𝗗𝗠𝗜𝗡", data="admin_panel", style="primary")],
-            [Button.inline("𝗔𝗗𝗗 𝗜𝗗", data="add_session", style="success"),
-             Button.inline("𝗧𝗔𝗥𝗚𝗘𝗧", data="target_menu", style="primary")]
+            [Button.inline("𝗔𝗗𝗗 𝗜𝗗", data="add_session"),
+             Button.inline("𝗧𝗔𝗥𝗚𝗘𝗧", data="target_menu")]
         ]
     else:
         caption += f"\n<b>⚠️ 𝗧𝗵𝗶𝘀 𝗯𝗼𝘁 𝗶𝘀 𝗼𝗻𝗹𝘆 𝗳𝗼𝗿 𝗮𝗱𝗺𝗶𝗻𝘀</b>"
@@ -299,11 +294,11 @@ async def target_menu(event):
 """
     
     buttons = [
-        [Button.inline("📎 𝗠𝗘𝗠𝗕𝗘𝗥 𝗔𝗗𝗗", data="target_join", style="success"),
-         Button.inline("📎 𝗠𝗘𝗠𝗕𝗘𝗥 𝗥𝗘𝗠𝗢𝗩𝗘", data="target_leave", style="danger")],
-        [Button.inline("😊 𝗥𝗘𝗔𝗖𝗧𝗜𝗢𝗡𝗦", data="target_reaction", style="primary"),
-         Button.inline("👁️ 𝗩𝗜𝗘𝗪𝗦", data="target_views", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="back_to_start", style="primary")]
+        [Button.inline("📎 𝗠𝗘𝗠𝗕𝗘𝗥 𝗔𝗗𝗗", data="target_join"),
+         Button.inline("📎 𝗠𝗘𝗠𝗕𝗘𝗥 𝗥𝗘𝗠𝗢𝗩𝗘", data="target_leave")],
+        [Button.inline("😊 𝗥𝗘𝗔𝗖𝗧𝗜𝗢𝗡𝗦", data="target_reaction"),
+         Button.inline("👁️ 𝗩𝗜𝗘𝗪𝗦", data="target_views")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="back_to_start")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -317,7 +312,7 @@ async def target_join(event):
     user_id = event.sender_id
     user_steps[user_id] = {"step": "join_channel", "type": "join"}
     
-    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]]
+    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]]
     
     msg = f"""
 <b>📎 𝗠𝗘𝗠𝗕𝗘𝗥 𝗔𝗗𝗗𝗜𝗡𝗚</b>
@@ -353,9 +348,9 @@ async def process_join_channel(event, user_id, channel_link):
 """
     
     buttons = [
-        [Button.inline("1", data="join_count_1", style="primary"), Button.inline("5", data="join_count_5", style="primary"), Button.inline("10", data="join_count_10", style="primary")],
-        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="join_count_all", style="success"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="join_count_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1", data="join_count_1"), Button.inline("5", data="join_count_5"), Button.inline("10", data="join_count_10")],
+        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="join_count_all"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="join_count_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -385,10 +380,10 @@ async def process_join_count(event, user_id, count_str):
 """
     
     buttons = [
-        [Button.inline("1𝘀", data="join_delay_1", style="primary"), Button.inline("3𝘀", data="join_delay_3", style="primary"), Button.inline("5𝘀", data="join_delay_5", style="primary")],
-        [Button.inline("10𝘀", data="join_delay_10", style="primary"), Button.inline("15𝘀", data="join_delay_15", style="primary")],
-        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="join_delay_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1𝘀", data="join_delay_1"), Button.inline("3𝘀", data="join_delay_3"), Button.inline("5𝘀", data="join_delay_5")],
+        [Button.inline("10𝘀", data="join_delay_10"), Button.inline("15𝘀", data="join_delay_15")],
+        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="join_delay_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -456,7 +451,7 @@ async def start_join_requests(event, user_id, delay):
         parse_mode='html'
     )
     
-    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu", style="primary")]]
+    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu")]]
     await event.reply("✅ 𝗧𝗮𝘀𝗸 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗱!", buttons=buttons, parse_mode='html')
     
     is_processing = False
@@ -470,7 +465,7 @@ async def target_leave(event):
     user_id = event.sender_id
     user_steps[user_id] = {"step": "leave_channel", "type": "leave"}
     
-    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]]
+    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]]
     
     msg = f"""
 <b>📎 𝗠𝗘𝗠𝗕𝗘𝗥 𝗥𝗘𝗠𝗢𝗩𝗘</b>
@@ -506,9 +501,9 @@ async def process_leave_channel(event, user_id, channel_link):
 """
     
     buttons = [
-        [Button.inline("1", data="leave_count_1", style="primary"), Button.inline("5", data="leave_count_5", style="primary"), Button.inline("10", data="leave_count_10", style="primary")],
-        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="leave_count_all", style="success"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="leave_count_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1", data="leave_count_1"), Button.inline("5", data="leave_count_5"), Button.inline("10", data="leave_count_10")],
+        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="leave_count_all"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="leave_count_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -538,10 +533,10 @@ async def process_leave_count(event, user_id, count_str):
 """
     
     buttons = [
-        [Button.inline("1𝘀", data="leave_delay_1", style="primary"), Button.inline("3𝘀", data="leave_delay_3", style="primary"), Button.inline("5𝘀", data="leave_delay_5", style="primary")],
-        [Button.inline("10𝘀", data="leave_delay_10", style="primary"), Button.inline("15𝘀", data="leave_delay_15", style="primary")],
-        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="leave_delay_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1𝘀", data="leave_delay_1"), Button.inline("3𝘀", data="leave_delay_3"), Button.inline("5𝘀", data="leave_delay_5")],
+        [Button.inline("10𝘀", data="leave_delay_10"), Button.inline("15𝘀", data="leave_delay_15")],
+        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="leave_delay_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -609,7 +604,7 @@ async def start_leave_requests(event, user_id, delay):
         parse_mode='html'
     )
     
-    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu", style="primary")]]
+    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu")]]
     await event.reply("✅ 𝗧𝗮𝘀𝗸 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗱!", buttons=buttons, parse_mode='html')
     
     is_processing = False
@@ -623,7 +618,7 @@ async def target_reaction(event):
     user_id = event.sender_id
     user_steps[user_id] = {"step": "reaction_channel", "type": "reaction"}
     
-    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]]
+    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]]
     
     msg = f"""
 <b>😊 𝗥𝗘𝗔𝗖𝗧𝗜𝗢𝗡𝗦</b>
@@ -678,9 +673,9 @@ async def process_reaction_post(event, user_id, post_link):
 """
     
     buttons = [
-        [Button.inline("1", data="reaction_count_1", style="primary"), Button.inline("5", data="reaction_count_5", style="primary"), Button.inline("10", data="reaction_count_10", style="primary")],
-        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="reaction_count_all", style="success"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="reaction_count_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1", data="reaction_count_1"), Button.inline("5", data="reaction_count_5"), Button.inline("10", data="reaction_count_10")],
+        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="reaction_count_all"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="reaction_count_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -711,10 +706,10 @@ async def process_reaction_count(event, user_id, count_str):
 """
     
     buttons = [
-        [Button.inline("1𝘀", data="reaction_delay_1", style="primary"), Button.inline("3𝘀", data="reaction_delay_3", style="primary"), Button.inline("5𝘀", data="reaction_delay_5", style="primary")],
-        [Button.inline("10𝘀", data="reaction_delay_10", style="primary"), Button.inline("15𝘀", data="reaction_delay_15", style="primary")],
-        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="reaction_delay_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1𝘀", data="reaction_delay_1"), Button.inline("3𝘀", data="reaction_delay_3"), Button.inline("5𝘀", data="reaction_delay_5")],
+        [Button.inline("10𝘀", data="reaction_delay_10"), Button.inline("15𝘀", data="reaction_delay_15")],
+        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="reaction_delay_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -789,7 +784,7 @@ async def start_reaction_sending(event, user_id, delay):
         parse_mode='html'
     )
     
-    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu", style="primary")]]
+    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu")]]
     await event.reply("✅ 𝗧𝗮𝘀𝗸 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗱!", buttons=buttons, parse_mode='html')
     
     is_processing = False
@@ -803,7 +798,7 @@ async def target_views(event):
     user_id = event.sender_id
     user_steps[user_id] = {"step": "views_channel", "type": "views"}
     
-    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]]
+    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]]
     
     msg = f"""
 <b>👁️ 𝗩𝗜𝗘𝗪𝗦</b>
@@ -858,9 +853,9 @@ async def process_views_post(event, user_id, post_link):
 """
     
     buttons = [
-        [Button.inline("1", data="views_count_1", style="primary"), Button.inline("5", data="views_count_5", style="primary"), Button.inline("10", data="views_count_10", style="primary")],
-        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="views_count_all", style="success"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="views_count_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1", data="views_count_1"), Button.inline("5", data="views_count_5"), Button.inline("10", data="views_count_10")],
+        [Button.inline(f"𝗔𝗟𝗟 ({total})", data="views_count_all"), Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="views_count_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -891,10 +886,10 @@ async def process_views_count(event, user_id, count_str):
 """
     
     buttons = [
-        [Button.inline("1𝘀", data="views_delay_1", style="primary"), Button.inline("3𝘀", data="views_delay_3", style="primary"), Button.inline("5𝘀", data="views_delay_5", style="primary")],
-        [Button.inline("10𝘀", data="views_delay_10", style="primary"), Button.inline("15𝘀", data="views_delay_15", style="primary")],
-        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="views_delay_custom", style="primary")],
-        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu", style="primary"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target", style="danger")]
+        [Button.inline("1𝘀", data="views_delay_1"), Button.inline("3𝘀", data="views_delay_3"), Button.inline("5𝘀", data="views_delay_5")],
+        [Button.inline("10𝘀", data="views_delay_10"), Button.inline("15𝘀", data="views_delay_15")],
+        [Button.inline("𝗖𝗨𝗦𝗧𝗢𝗠", data="views_delay_custom")],
+        [Button.inline("🔙 𝗕𝗔𝗖𝗞", data="target_menu"), Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_target")]
     ]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
@@ -963,7 +958,7 @@ async def start_views_sending(event, user_id, delay):
         parse_mode='html'
     )
     
-    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu", style="primary")]]
+    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞 𝗧𝗢 𝗠𝗘𝗡𝗨", data="target_menu")]]
     await event.reply("✅ 𝗧𝗮𝘀𝗸 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗱!", buttons=buttons, parse_mode='html')
     
     is_processing = False
@@ -977,7 +972,7 @@ async def add_session(event):
     user_id = event.sender_id
     user_steps[user_id] = {"step": "awaiting_phone"}
     
-    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_add", style="danger")]]
+    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_add")]]
     
     msg = f"""
 <b>📱 𝗔𝗗𝗗 𝗜𝗗</b>
@@ -1006,7 +1001,7 @@ async def process_phone(event, user_id, phone):
         await client.send_code_request(phone)
         user_steps[user_id]["temp_client"] = client
         
-        buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_add", style="danger")]]
+        buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_add")]]
         
         msg = f"""
 <b>📱 𝗢𝗧𝗣 𝘀𝗲𝗻𝘁 𝘁𝗼 {phone}</b>
@@ -1056,7 +1051,7 @@ async def process_otp(event, user_id, otp_input):
     except SessionPasswordNeededError:
         user_steps[user_id]["step"] = "awaiting_2fa"
         user_steps[user_id]["has_2fa"] = True
-        buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_add", style="danger")]]
+        buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_add")]]
         
         msg = f"""
 <b>🔐 𝟮𝗙𝗔 𝗲𝗻𝗮𝗯𝗹𝗲𝗱</b>
@@ -1108,7 +1103,7 @@ async def admin_panel(event):
     user_id = event.sender_id
     user_steps[user_id] = {"step": "awaiting_admin_id"}
     
-    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_admin", style="danger")]]
+    buttons = [[Button.inline("❌ 𝗖𝗔𝗡𝗖𝗘𝗟", data="cancel_admin")]]
     
     msg = f"""
 <b>👑 𝗔𝗗𝗠𝗜𝗡 𝗣𝗔𝗡𝗘𝗟</b>
@@ -1181,7 +1176,7 @@ async def owner_panel(event):
 
 <b>𝗖𝗼𝗻𝘁𝗮𝗰𝘁 𝗢𝘄𝗻𝗲𝗿:- @{OWNER_USERNAME} | @{SECOND_OWNER_USERNAME}</b>
 """
-    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞", data="back_to_start", style="primary")]]
+    buttons = [[Button.inline("🔙 𝗕𝗔𝗖𝗞", data="back_to_start")]]
     
     await event.reply(msg, buttons=buttons, parse_mode='html')
 
